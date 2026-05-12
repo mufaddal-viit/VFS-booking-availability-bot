@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:schengenappointments.com)",
+      "PowerShell(py -m pip install -r requirements.txt --quiet 2>&1)",
+      "PowerShell(py main.py --once 2>&1)",
+      "PowerShell(py debug_diff.py)",
+      "PowerShell(py test_parse_cell.py)"
+    ]
+  }
+}
