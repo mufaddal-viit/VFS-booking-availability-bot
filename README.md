@@ -1,6 +1,8 @@
 # Schengen Appointment Watcher
 
-A lightweight Python watcher that scrapes [schengenappointments.com](https://schengenappointments.com/), detects changes in appointment availability, and pushes alerts to a Telegram bot.
+A lightweight Python watcher that scrapes [schengenappointments.com](https://schengenappointments.com/) for **Abu Dhabi and Dubai** (tourism + business visa types), detects changes in appointment availability, and pushes alerts to a Telegram bot.
+
+Each Telegram alert links directly to the VFS Global booking page for that country, so the recipient can act in one tap.
 
 Built around the fact that the appointment table is rendered **directly in the static HTML**, so no headless browser is needed — `requests` + `BeautifulSoup` is enough.
 
@@ -11,9 +13,12 @@ Built around the fact that the appointment table is rendered **directly in the s
 - [Architecture](#architecture)
 - [Project Structure](#project-structure)
 - [How It Works](#how-it-works)
+- [What Triggers a Telegram Message](#what-triggers-a-telegram-message)
 - [Setup](#setup)
 - [How to Run](#how-to-run)
 - [How to Check the Output](#how-to-check-the-output)
+- [Debug Dumps](#debug-dumps)
+- [Snapshot Mechanics](#snapshot-mechanics)
 - [Simulating a Change](#simulating-a-change-end-to-end-test)
 - [Configuration Reference](#configuration-reference)
 - [Notes & Decisions](#notes--decisions)
@@ -23,23 +28,52 @@ Built around the fact that the appointment table is rendered **directly in the s
 ## Architecture
 
 ```
-[schengenappointments.com HTML]
-        │
-        ▼
-   requests.get()              → fetcher.py
-        │
-        ▼
-   BeautifulSoup parse         → parser.py
-        │
-        ▼
-   compare with cached snap    → differ.py + state.py
-        │
-        ▼
-   send change events          → notifier.py (Telegram Bot API)
-        │
-        ▼
-   save new snapshot to disk   → state.py (snapshot.json)
+                       ┌──────────────────────────────────┐
+  4 source URLs ───►   │  fetcher.py — requests.get()     │
+  (city × visa_type)   │                                  │
+                       │  parser.py — BeautifulSoup       │
+                       │    • extract country, status     │
+                       │    • map country → VFS URL       │
+                       │    • tag with source             │
+                       └────────────┬─────────────────────┘
+                                    │
+                                    ▼  list of 69 row dicts
+                       ┌──────────────────────────────────┐
+                       │  differ.py                       │
+                       │    • compare with snapshot.json  │
+                       │    • ignore `last_checked`       │
+                       │    • produce change events       │
+                       └────────────┬─────────────────────┘
+                                    │
+                                    ▼  events[]
+                       ┌──────────────────────────────────┐
+                       │  notifier.py                     │
+                       │    • filter: only available-slot │
+                       │      events (became_available,   │
+                       │      date_changed)               │
+                       │    • POST to Telegram Bot API    │
+                       └────────────┬─────────────────────┘
+                                    │
+                                    ▼
+                       ┌──────────────────────────────────┐
+                       │  state.py                        │
+                       │    save_snapshot(new_rows)       │
+                       │    → snapshot.json (atomic)      │
+                       └──────────────────────────────────┘
 ```
+
+### Sources
+
+4 URLs are scraped every cycle, defined in [config.py](config.py):
+
+| key | URL |
+|---|---|
+| `abu-dhabi/tourism` | `https://schengenappointments.com/in/abu-dhabi/tourism` |
+| `abu-dhabi/business` | `https://schengenappointments.com/in/abu-dhabi/business` |
+| `dubai/tourism` | `https://schengenappointments.com/in/dubai/tourism` |
+| `dubai/business` | `https://schengenappointments.com/in/dubai/business` |
+
+Each parsed row is tagged with `source_key`, `city`, `visa_type`, and gets a stable id `{source_key}::{country}` so countries from different sources never collide.
 
 ### Tech Stack
 
@@ -52,31 +86,28 @@ Built around the fact that the appointment table is rendered **directly in the s
 | Notifications | Raw `requests` to Telegram Bot API | Zero extra deps |
 | Scheduling | `schedule` library | Simple in-process loop |
 
-### Why NOT a headless browser?
-
-The appointment table is fully rendered in the static HTML returned by a plain HTTP GET. The HTML contains a real `<table class="table-pin-cols ...">` with one `<tr>` per country and the status text (e.g. `21 May`, `Waitlist Open`) directly inside `<span class="font-bold ...">`. So `requests` + `BeautifulSoup` is:
-
-- ~10x faster than Playwright/Selenium
-- No browser binaries to install
-- Easier to deploy anywhere
-
 ---
 
 ## Project Structure
 
 ```
 dataExtractor/
-├── config.py           # loads env vars (token, chat id, intervals, paths)
+├── config.py           # env vars + 4-source URL builder
+├── countries.py        # country name → VFS Global ISO-3 code mapping
 ├── fetcher.py          # HTTP GET → raw HTML
-├── parser.py           # BeautifulSoup → list of row dicts
+├── parser.py           # BeautifulSoup → list of row dicts (with VFS URLs)
 ├── state.py            # load/save snapshot.json atomically
 ├── differ.py           # compare old vs new rows → events
 ├── notifier.py         # format + send Telegram messages
+├── debug.py            # write raw HTML + parsed-data dumps to disk
 ├── main.py             # CLI + scheduler loop
 ├── requirements.txt    # Python deps
-├── .env.example        # template for environment variables
-├── .gitignore          # excludes .env, snapshot.json, logs
-├── snapshot.json       # (generated) last known state
+├── .env                # (gitignored) Telegram credentials
+├── .env.example        # template for .env
+├── .gitignore
+├── snapshot.json       # (generated) last known state of all 4 sources
+├── debug_dump.json     # (generated) parsed rows per source
+├── debug_*.html        # (generated) raw HTML per source
 └── extractor.log       # (generated) runtime log
 ```
 
@@ -87,41 +118,42 @@ dataExtractor/
 ### Per-cycle flow
 
 ```
-                    ┌──────────────────────────┐
-                    │   main.py (scheduler)    │
-                    │   every 10 minutes       │
-                    └────────────┬─────────────┘
-                                 │ calls run_once()
-                                 ▼
-   ┌────────────────────────────────────────────────────────┐
-   │  1. fetcher.py                                         │
-   │     requests.get("https://schengenappointments.com/")  │
-   │     → returns raw HTML string                          │
-   ├────────────────────────────────────────────────────────┤
-   │  2. parser.py                                          │
-   │     BeautifulSoup finds <table>                        │
-   │     For each <tr>: extract country, status, checked    │
-   │     → returns [{country, status, status_type, ...}]    │
-   ├────────────────────────────────────────────────────────┤
-   │  3. state.load_snapshot()                              │
-   │     Reads previous run from snapshot.json              │
-   │     → returns old_rows[]                               │
-   ├────────────────────────────────────────────────────────┤
-   │  4. differ.py                                          │
-   │     Compares new_rows vs old_rows                      │
-   │     → returns events[] like:                           │
-   │       [{country: "Denmark", kind: "date_changed",      │
-   │         old: {...}, new: {...}}]                       │
-   ├────────────────────────────────────────────────────────┤
-   │  5. notifier.py                                        │
-   │     For each event → format HTML message               │
-   │     POST to api.telegram.org/bot.../sendMessage        │
-   │     → message appears in your Telegram                 │
-   ├────────────────────────────────────────────────────────┤
-   │  6. state.save_snapshot(new_rows)                      │
-   │     Writes new_rows to snapshot.json                   │
-   │     → becomes "old" for next cycle                     │
-   └────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│  main.py — run_once()  (called every POLL_INTERVAL_MINUTES)     │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+   ┌─────────────────────────────────────────────────────────┐
+   │  1. collect_all_rows()                                  │
+   │     For each of 4 sources (city × visa_type):           │
+   │       a. fetcher.fetch_html(source.url)                 │
+   │       b. parser.parse_appointments(html, source)        │
+   │     Merge all rows into one list                        │
+   ├─────────────────────────────────────────────────────────┤
+   │  2. parser.py per row                                   │
+   │     • Extract country (e.g. "Denmark 🇩🇰")              │
+   │     • Look up VFS URL via countries.get_vfs_url()       │
+   │       → https://visa.vfsglobal.com/are/en/dnk/login     │
+   │     • Extract status: "21 May" / "Waitlist Open" /      │
+   │       "No availability"                                 │
+   │     • Classify status_type                              │
+   │     • Build stable id = "city/visa_type::country"       │
+   ├─────────────────────────────────────────────────────────┤
+   │  3. state.load_snapshot()                               │
+   │     Read snapshot.json → old_rows                       │
+   ├─────────────────────────────────────────────────────────┤
+   │  4. differ.diff_snapshots(old_rows, new_rows)           │
+   │     • Match rows by id                                  │
+   │     • Compare every field EXCEPT last_checked           │
+   │     • Emit change events                                │
+   ├─────────────────────────────────────────────────────────┤
+   │  5. notifier.notify_events(events)                      │
+   │     • Filter to became_available + date_changed only    │
+   │     • Format and POST to Telegram                       │
+   ├─────────────────────────────────────────────────────────┤
+   │  6. state.save_snapshot(new_rows)                       │
+   │     Atomically overwrite snapshot.json                  │
+   └─────────────────────────────────────────────────────────┘
 ```
 
 ### Data model
@@ -131,38 +163,70 @@ Each parsed row looks like:
 ```json
 {
   "country": "Denmark 🇩🇰",
-  "country_url": "https://schengenappointments.com/in/dubai/denmark/tourism",
+  "country_url": "https://visa.vfsglobal.com/are/en/dnk/login",
   "status": "21 May",
   "status_type": "available",
   "last_checked": "38 minutes ago",
-  "months": { "May": false, "Jun": false, "Jul": false }
+  "months": { "May": false, "Jun": false, "Jul": false },
+  "source_key": "dubai/tourism",
+  "city": "dubai",
+  "visa_type": "tourism",
+  "id": "dubai/tourism::Denmark 🇩🇰"
 }
 ```
 
-`status_type` is classified into one of:
+`status_type` is one of:
 - `available` — concrete date like `21 May`, `07 Jul`
 - `waitlist` — `Waitlist Open`
-- `unavailable` — `No availability` / no appointments
+- `unavailable` — `No availability`
 - `unknown` — fallback for unrecognised text
 
-### Event kinds produced by the differ
+---
 
-| Kind | When it fires |
-|---|---|
-| `new_country` | A country appears that wasn't in the previous snapshot |
-| `became_available` | Status moved from non-available → an actual date |
-| `became_unavailable` | Status moved from a date → no availability/waitlist |
-| `date_changed` | Was available, still available, but the date changed |
-| `status_changed` | Catch-all for other transitions (e.g. waitlist ↔ unavailable) |
-| `removed` | A country in the old snapshot no longer appears |
+## What Triggers a Telegram Message
 
-### First-run behavior
+The differ detects **all** changes (any field except `last_checked`), but the notifier **only sends Telegram messages for events that mean a slot is bookable or has moved**.
 
-On the very first run, `snapshot.json` doesn't exist. Without protection, the differ would flag **every country as `new_country`** → spam.
+### Event kinds and notification policy
 
-So [main.py](main.py) detects an empty baseline and silently saves the initial state without sending any messages. From the second run onward, only *changes* trigger notifications.
+| Event kind | Fires when… | Telegram sent? |
+|---|---|---|
+| **`became_available`** | Status went from waitlist/unavailable/unknown → a concrete date (e.g. Waitlist Open → 21 May) | ✅ **YES** |
+| **`date_changed`** | Status was an available date and still is, but the date itself changed (e.g. 21 May → 18 May) | ✅ **YES** |
+| `new_country` | A country appeared that wasn't in the previous snapshot | ❌ No |
+| `became_unavailable` | Was on a concrete date, now waitlist or no availability | ❌ No |
+| `status_changed` | Other transitions (e.g. waitlist ↔ no availability) | ❌ No |
+| `removed` | Country dropped from the table | ❌ No |
 
-Override with `--notify-first-run` if you want a full state dump on startup.
+### What counts as a "change"
+
+A row is treated as changed if **any of these fields differ** between snapshots:
+
+- `country`
+- `country_url` (VFS link)
+- `status` (`"21 May"`, `"Waitlist Open"`, `"No availability"`)
+- `status_type`
+- `months` (per-month availability dict)
+- `source_key` / `city` / `visa_type` / `id`
+
+The **only ignored field is `last_checked`** ("checked X minutes ago"), which ticks forward constantly and would otherwise produce a false change every run.
+
+### Message format
+
+```
+🟢 Denmark 🇩🇰
+📅 21 May
+📍 Dubai • Tourism
+Book now → https://visa.vfsglobal.com/are/en/dnk/login
+```
+
+Each part:
+- **Country** with flag (as scraped)
+- **Status** — the date or status string
+- **Location line** — which city + visa type this came from (so you know whether it's Dubai/Tourism vs Abu-Dhabi/Business)
+- **Book now** — direct link to the VFS Global booking page (rendered as a clickable HTML link in Telegram)
+
+If a country has no VFS URL mapping (e.g. Cyprus), the Book-now link is omitted but the rest of the message still goes through.
 
 ---
 
@@ -178,25 +242,25 @@ py -m pip install -r requirements.txt
 
 1. Open Telegram, search for `@BotFather`
 2. Send `/newbot`, follow the prompts
-3. Save the token it gives you (looks like `1234567890:ABC-DEF...`)
+3. Save the token (e.g. `1234567890:ABC-DEF...`)
 
 ### 3. Find your chat ID
 
-1. Send any message to your new bot from your Telegram account
-2. Open in browser: `https://api.telegram.org/bot<YOUR_TOKEN>/getUpdates`
+1. Send any message to your new bot
+2. Open `https://api.telegram.org/bot<YOUR_TOKEN>/getUpdates`
 3. Find `"chat":{"id":12345678,...}` — that number is your chat ID
 
 ### 4. Configure environment variables
 
-Copy [.env.example](.env.example) to `.env` and fill in your values:
+Copy [.env.example](.env.example) → `.env` and fill in:
 
 ```
 TELEGRAM_BOT_TOKEN=1234567890:ABC-DEF...
 TELEGRAM_CHAT_ID=12345678
-TARGET_URL=https://schengenappointments.com/
 POLL_INTERVAL_MINUTES=10
 SNAPSHOT_FILE=snapshot.json
 LOG_FILE=extractor.log
+DEBUG_DUMP_FILE=debug_dump.json
 ```
 
 ---
@@ -209,15 +273,23 @@ LOG_FILE=extractor.log
 py main.py --test-telegram
 ```
 
-Sends one test message. If it lands in your Telegram, your bot/token/chat ID are correct.
+Sends one test message. If it lands in your Telegram, your credentials are correct.
 
-### One-off run (no scheduler)
+### One-off run
 
 ```powershell
 py main.py --once
 ```
 
-Fetches, parses, diffs against `snapshot.json`, sends change messages, then exits. Ideal for cron jobs or Windows Task Scheduler.
+Fetches all 4 sources, parses, diffs against `snapshot.json`, sends change messages, then exits. Ideal for cron / Task Scheduler.
+
+### One-off run with debug dumps
+
+```powershell
+py main.py --once --debug-dump
+```
+
+Same as `--once`, but additionally saves raw HTML and parsed-data dumps. See [Debug Dumps](#debug-dumps).
 
 ### Continuous run (default mode)
 
@@ -233,11 +305,9 @@ Runs forever — first check immediately, then every `POLL_INTERVAL_MINUTES` min
 py main.py --once --notify-first-run
 ```
 
-Sends a Telegram message for every row even when there's no prior snapshot. Useful for sanity-checking the format.
+Sends a Telegram message for every available slot even on the very first run. Default behaviour is silent on first run.
 
-### Run as a background scheduled task on Windows
-
-If you'd rather not keep a terminal open, schedule the `--once` form via **Task Scheduler**:
+### Run as a Windows scheduled task
 
 1. Open Task Scheduler → Create Basic Task
 2. Trigger: Daily, repeat every 10 minutes for 1 day
@@ -255,13 +325,14 @@ If you'd rather not keep a terminal open, schedule the `--once` form via **Task 
 Every run prints to both the console and [extractor.log](extractor.log):
 
 ```
-2026-05-12 13:14:10 INFO [parser] Parsed 19 appointment rows
-2026-05-12 13:14:10 INFO [main]   First run — saving baseline of 19 rows
-2026-05-12 13:24:10 INFO [differ] Diff produced 2 events
-2026-05-12 13:24:11 INFO [main]   2 change events detected
+2026-05-12 15:06:42 INFO [main]    Fetching https://schengenappointments.com/in/abu-dhabi/tourism
+2026-05-12 15:06:43 INFO [parser]  Parsed 18 rows from abu-dhabi/tourism
+2026-05-12 15:06:43 WARNING [parser]  No VFS code mapping for country: Cyprus
+...
+2026-05-12 15:06:47 INFO [main]    First run — saving baseline of 69 rows, no notifications
 ```
 
-Tail the log live in PowerShell:
+Tail it live in PowerShell:
 
 ```powershell
 Get-Content extractor.log -Wait -Tail 20
@@ -269,70 +340,107 @@ Get-Content extractor.log -Wait -Tail 20
 
 ### 2. The snapshot file
 
-[snapshot.json](snapshot.json) holds the **last known state** of the site:
+[snapshot.json](snapshot.json) holds the **last known state** of all 4 sources combined. Open it any time to inspect what the watcher believes the world looks like.
+
+### 3. Telegram messages
+
+The user-facing output. See [What Triggers a Telegram Message](#what-triggers-a-telegram-message) for the exact format and policy.
+
+---
+
+## Debug Dumps
+
+Run `py main.py --once --debug-dump` to save inspection files:
+
+| File | Contents |
+|---|---|
+| `debug_abu-dhabi_tourism.html` | Raw HTML from `https://schengenappointments.com/in/abu-dhabi/tourism` |
+| `debug_abu-dhabi_business.html` | Raw HTML from the business URL |
+| `debug_dubai_tourism.html` | Raw HTML |
+| `debug_dubai_business.html` | Raw HTML |
+| `debug_dump.json` | Parsed rows grouped by source, with row counts |
+
+Open `debug_dump.json` to see exactly what the parser extracted from each source:
 
 ```json
 {
-  "timestamp": "2026-05-12T13:14:10+00:00",
+  "timestamp": "2026-05-12T11:04:49+00:00",
+  "sources": {
+    "abu-dhabi/tourism": {
+      "row_count": 18,
+      "rows": [ ... ]
+    },
+    "abu-dhabi/business": { "row_count": 16, "rows": [...] },
+    "dubai/tourism":      { "row_count": 19, "rows": [...] },
+    "dubai/business":     { "row_count": 16, "rows": [...] }
+  }
+}
+```
+
+Use this when:
+- A parser change needs verification
+- A country isn't showing up where you expect
+- You want to inspect raw HTML structure without re-fetching
+
+---
+
+## Snapshot Mechanics
+
+### What `snapshot.json` is
+
+A single JSON file storing the **last successfully-parsed state of all 4 sources combined**. It's the "memory" the differ compares against on the next run.
+
+### Shape
+
+```json
+{
+  "timestamp": "2026-05-12T11:04:49+00:00",
   "rows": [
-    {
-      "country": "Denmark 🇩🇰",
-      "status": "21 May",
-      "status_type": "available",
-      "last_checked": "38 minutes ago",
-      "months": { "May": false, "Jun": false, "Jul": false }
-    }
+    { "id": "dubai/tourism::Denmark 🇩🇰", "status": "21 May", ... },
+    { "id": "abu-dhabi/business::Italy 🇮🇹", "status": "No availability", ... }
   ]
 }
 ```
 
-Open it any time to see what the watcher currently believes the world looks like.
+### Lifecycle per `run_once()`
 
-### 3. Telegram messages
-
-The actual user-facing output. Examples of what you'll see:
-
-**A new appointment opened up:**
 ```
-🟢 Appointment available
-🌍 Denmark 🇩🇰
-Before: Waitlist Open (checked 38 minutes ago)
-Now:    21 May (checked 2 minutes ago)
-Open page
+1. fetch all 4 sources → 69 fresh rows
+2. load_snapshot() reads snapshot.json from disk → old_rows
+3. diff_snapshots(old_rows, new_rows) → events[]
+4. notify_events(events) → Telegram (filtered to available-slot events)
+5. save_snapshot(new_rows) → overwrites snapshot.json
 ```
 
-**Date moved earlier (the most valuable signal):**
-```
-🔄 Date changed
-🌍 Norway 🇳🇴
-Before: 14 May
-Now:    07 May
-Open page
-```
+So on cycle N+1, the snapshot from cycle N becomes the "old" baseline.
 
-**Availability gone:**
-```
-🔴 No longer available
-🌍 Luxembourg
-Before: 07 Jul
-Now:    No availability
-Open page
-```
+### How it's created
 
-Messages are **prioritized** — `became_available` events come first since those are the ones you actually care about.
+- **First run**: `snapshot.json` doesn't exist → `load_snapshot()` returns `{"rows": []}` → main detects empty baseline → silently saves the first ~69 rows, **no Telegram messages**
+- **Subsequent runs**: loaded, compared, then overwritten
+
+### Atomic writes
+
+`save_snapshot()` writes to `snapshot.json.tmp` first, then calls `os.replace()`. If the program crashes mid-write, the existing snapshot stays intact — never a half-written corrupt file.
+
+### Why a single JSON file instead of SQLite
+
+Only the *latest* state is needed for diffing. Keeping history would require SQLite. JSON is human-readable, easy to back up, and easy to edit by hand (great for testing — change a status, run again, see the alert).
 
 ---
 
 ## Simulating a Change (end-to-end test)
 
-To verify the full pipeline works without waiting for the real site to change:
+To verify the full pipeline without waiting for the real site to change:
 
 1. Run `py main.py --once` to create a baseline
-2. Open `snapshot.json` and change one country's `status` from `"21 May"` to `"99 Dec"`, save
+2. Open `snapshot.json` and edit one country's `status` from a real date (e.g. `"21 May"`) to `"99 Dec"`, save
 3. Run `py main.py --once` again
 4. You should get a Telegram message saying the date changed back to `21 May`
 
-This proves the full pipeline (fetch → parse → diff → Telegram → snapshot save) is working.
+This proves the full pipeline (fetch → parse → diff → Telegram → snapshot save) works.
+
+Tip: to force a `became_available` event instead of `date_changed`, edit the status to `"Waitlist Open"` and `status_type` to `"waitlist"` before re-running.
 
 ---
 
@@ -344,18 +452,28 @@ All settings live in `.env` (see [.env.example](.env.example)).
 |---|---|---|
 | `TELEGRAM_BOT_TOKEN` | *(required)* | Bot token from @BotFather |
 | `TELEGRAM_CHAT_ID` | *(required)* | Numeric chat ID where messages are sent |
-| `TARGET_URL` | `https://schengenappointments.com/` | Page to scrape |
 | `POLL_INTERVAL_MINUTES` | `10` | How often the scheduler runs |
 | `SNAPSHOT_FILE` | `snapshot.json` | Where the last-known state is stored |
 | `LOG_FILE` | `extractor.log` | Runtime log path |
+| `DEBUG_DUMP_FILE` | `debug_dump.json` | Path for `--debug-dump` parsed-data output |
+
+The 4 URLs are hard-coded in [config.py](config.py):
+
+```python
+CITIES = ["abu-dhabi", "dubai"]
+VISA_TYPES = ["tourism", "business"]
+```
+
+Change these constants if you need different cities/visa types.
 
 ### CLI flags
 
 | Flag | What it does |
 |---|---|
 | `--once` | Run one check and exit (otherwise: scheduler loop) |
-| `--test-telegram` | Send one test message and exit (verifies credentials) |
-| `--notify-first-run` | Send notifications for every row on the first run |
+| `--test-telegram` | Send one test message and exit |
+| `--notify-first-run` | Send notifications for every available slot on the first run |
+| `--debug-dump` | Save raw HTML + parsed-data dumps to disk |
 
 ---
 
@@ -363,34 +481,27 @@ All settings live in `.env` (see [.env.example](.env.example)).
 
 ### Why poll every 10 minutes?
 
-The site explicitly states data is updated "every few minutes". 10 minutes is a balance between responsiveness and being polite to their servers. You can tighten it to 5 if you want.
+The site explicitly states data is updated "every few minutes". 10 minutes is a balance between responsiveness and being polite to their servers. You can tighten it to 5 if needed.
 
-### Why JSON instead of SQLite for state?
+### Country code mapping
 
-You only need the *latest* snapshot for diffing, not history. A single JSON file is:
-- Easier to inspect by hand
-- Easier to back up / version
-- Zero schema migration burden
+[countries.py](countries.py) maps country names to ISO-3 codes used by VFS Global. The mapping uses a normalisation that strips flag emojis and converts spaces to underscores, so `"Czechia 🇨🇿"` and `"Czech_Republic"` both map to `cze`.
 
-If you later want history (e.g. "show me how Norway's availability has moved over the last month"), SQLite makes sense.
+If the site ever lists a country not in your mapping, the parser logs a warning and `country_url` is set to `null` — the row still goes through the pipeline, just without a Book-now link.
 
 ### Why HTML scraping instead of an API?
 
-There is no documented public API. The site says: *"The data here is pulled from visa center websites as frequently as possible."* — i.e. they're scraping too. Using their HTML table as a read-only public snapshot is the practical option.
+There is no documented public API. The site says: *"The data here is pulled from visa center websites as frequently as possible."* — they're scraping too. Using their HTML table as a read-only public snapshot is the practical option.
 
 ### How fragile is the parser?
 
 Moderately. It depends on:
-- A single `<table>` on the homepage
-- Status text living inside `<span class="font-bold ...">`
+- A single `<table>` per page
+- Status text living inside `<span class="font-bold ...">` (available/waitlist) or `<span class="text-error ...">` (no availability)
 - "checked N minutes ago" inside `<span class="badge ...">`
 
 If the site redesigns, the parser will need adjusting. The `_classify()` function in [parser.py](parser.py) is the regex layer that translates raw text into `available`/`waitlist`/`unavailable` — most format changes only need a tweak there.
 
-### What about rate limiting?
-
-The Telegram Bot API allows ~30 messages/second. We send messages serially per cycle, so unless the site adds 30+ new countries between two polls, we're well within limits.
-
 ### Atomic snapshot writes
 
-`state.save_snapshot()` writes to `snapshot.json.tmp` first, then `os.replace()`s it over the target. This means a crash mid-write can't corrupt the snapshot — you'll either have the old version or the new one, never a half-written file.
+`state.save_snapshot()` writes to `snapshot.json.tmp` first, then `os.replace()`s it. A crash mid-write can't corrupt the snapshot — you'll always have either the old version or the new one, never a half-written file.

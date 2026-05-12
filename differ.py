@@ -2,65 +2,85 @@ import logging
 
 log = logging.getLogger(__name__)
 
+# Fields we DO NOT consider when diffing (volatile metadata)
+IGNORED_FIELDS = {"last_checked"}
 
-def _index_by_country(rows: list[dict]) -> dict[str, dict]:
-    return {r["country"]: r for r in rows}
+
+def _row_key(row: dict) -> str:
+    return row.get("id") or row.get("country") or ""
+
+
+def _index(rows: list[dict]) -> dict[str, dict]:
+    return {_row_key(r): r for r in rows if _row_key(r)}
+
+
+def _comparable(row: dict) -> dict:
+    return {k: v for k, v in row.items() if k not in IGNORED_FIELDS}
+
+
+def _classify_change(old: dict, new: dict) -> str:
+    old_type = old.get("status_type")
+    new_type = new.get("status_type")
+    if new_type == "available" and old_type != "available":
+        return "became_available"
+    if old_type == "available" and new_type != "available":
+        return "became_unavailable"
+    if old_type == "available" and new_type == "available":
+        return "date_changed"
+    return "status_changed"
 
 
 def diff_snapshots(old_rows: list[dict], new_rows: list[dict]) -> list[dict]:
-    """Return a list of change events.
+    """Compare old vs new rows. Any field change except `last_checked` is a change.
 
-    Event shape: { country, kind, old, new }
+    Event shape: { id, country, source_key, kind, old, new, changed_fields }
     kind in: new_country, became_available, became_unavailable, date_changed,
              status_changed, removed
     """
-    old = _index_by_country(old_rows)
-    new = _index_by_country(new_rows)
+    old = _index(old_rows)
+    new = _index(new_rows)
     events: list[dict] = []
 
-    for country, n in new.items():
-        o = old.get(country)
+    for row_id, n in new.items():
+        o = old.get(row_id)
         if o is None:
             events.append({
-                "country": country,
+                "id": row_id,
+                "country": n.get("country"),
+                "source_key": n.get("source_key"),
                 "kind": "new_country",
                 "old": None,
                 "new": n,
+                "changed_fields": list(_comparable(n).keys()),
             })
             continue
 
-        # Only compare status, ignore last_checked time (it always changes)
-        old_status = (o.get("status") or "").strip()
-        new_status = (n.get("status") or "").strip()
-        if old_status == new_status:
+        old_cmp = _comparable(o)
+        new_cmp = _comparable(n)
+        if old_cmp == new_cmp:
             continue
 
-        old_type = o.get("status_type")
-        new_type = n.get("status_type")
-
-        if new_type == "available" and old_type != "available":
-            kind = "became_available"
-        elif old_type == "available" and new_type != "available":
-            kind = "became_unavailable"
-        elif old_type == "available" and new_type == "available":
-            kind = "date_changed"
-        else:
-            kind = "status_changed"
-
+        changed = [k for k in set(old_cmp) | set(new_cmp) if old_cmp.get(k) != new_cmp.get(k)]
         events.append({
-            "country": country,
-            "kind": kind,
+            "id": row_id,
+            "country": n.get("country"),
+            "source_key": n.get("source_key"),
+            "kind": _classify_change(o, n),
             "old": o,
             "new": n,
+            "changed_fields": changed,
         })
 
-    for country, o in old.items():
-        if country not in new:
+    for row_id, o in old.items():
+        if row_id not in new:
             events.append({
-                "country": country,
+                "id": row_id,
+                "country": o.get("country"),
+                "source_key": o.get("source_key"),
                 "kind": "removed",
                 "old": o,
                 "new": None,
+                "changed_fields": [],
             })
 
     log.info("Diff produced %d events", len(events))

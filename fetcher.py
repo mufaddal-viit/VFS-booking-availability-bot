@@ -1,11 +1,11 @@
 import logging
 import requests
-from config import TARGET_URL, REQUEST_TIMEOUT, USER_AGENT
+from config import REQUEST_TIMEOUT, USER_AGENT
 
 log = logging.getLogger(__name__)
 
 
-def fetch_html(url: str = TARGET_URL) -> str | None:
+def fetch_html(url: str) -> str | None:
     try:
         resp = requests.get(
             url,

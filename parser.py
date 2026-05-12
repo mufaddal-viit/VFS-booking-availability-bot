@@ -2,6 +2,8 @@ import logging
 import re
 from bs4 import BeautifulSoup
 
+from countries import get_vfs_url
+
 log = logging.getLogger(__name__)
 
 NO_AVAIL_TOKENS = ("no appointments", "no availability")
@@ -22,10 +24,11 @@ def _classify(status_text: str) -> str:
     return "unknown"
 
 
-def parse_appointments(html: str) -> list[dict]:
-    """Parse schengenappointments.com homepage table into a list of row dicts.
+def parse_appointments(html: str, source: dict | None = None) -> list[dict]:
+    """Parse schengenappointments.com table into a list of row dicts.
 
-    Each dict: country, country_url, status, status_type, last_checked, months
+    If `source` is provided (with keys: key, city, visa_type), each row
+    is tagged with source_key/city/visa_type and gets a stable `id`.
     """
     soup = BeautifulSoup(html, "lxml")
     table = soup.find("table")
@@ -57,10 +60,25 @@ def parse_appointments(html: str) -> list[dict]:
 
         country_link = country_cell.find("a")
         country = _clean(country_link.get_text()) if country_link else _clean(country_cell.get_text())
-        country_url = country_link.get("href") if country_link else None
+        country_url = get_vfs_url(country)
+        if not country_url:
+            # Strip non-ASCII (flag emojis) so Windows console can log it safely
+            safe_name = country.encode("ascii", "ignore").decode("ascii").strip()
+            log.warning("No VFS code mapping for country: %s", safe_name)
 
-        status_span = status_cell.find("span", class_=re.compile(r"font-bold"))
-        status = _clean(status_span.get_text()) if status_span else _clean(status_cell.get_text())
+        # Status text — try font-bold (available/waitlist) then text-error (no availability)
+        status_span = (
+            status_cell.find("span", class_=re.compile(r"font-bold"))
+            or status_cell.find("span", class_=re.compile(r"text-error"))
+        )
+        if status_span:
+            status = _clean(status_span.get_text())
+        else:
+            # Fallback: strip out badge + notify-me, take what's left
+            cell_copy = BeautifulSoup(str(status_cell), "lxml")
+            for tag in cell_copy.find_all("span", class_=re.compile(r"badge|notify")):
+                tag.decompose()
+            status = _clean(cell_copy.get_text())
 
         checked_span = status_cell.find("span", class_=re.compile(r"badge"))
         last_checked = _clean(checked_span.get_text()) if checked_span else ""
@@ -76,14 +94,23 @@ def parse_appointments(html: str) -> list[dict]:
                 tip = a["data-tip"].lower()
             months[month_headers[i]] = not any(tok in tip for tok in NO_AVAIL_TOKENS) if tip else False
 
-        rows.append({
+        row = {
             "country": country,
             "country_url": country_url,
             "status": status,
             "status_type": _classify(status),
             "last_checked": last_checked,
             "months": months,
-        })
+        }
+        if source:
+            row["source_key"] = source.get("key")
+            row["city"] = source.get("city")
+            row["visa_type"] = source.get("visa_type")
+            row["id"] = f"{source.get('key')}::{country}"
+        else:
+            row["id"] = country
+        rows.append(row)
 
-    log.info("Parsed %d appointment rows", len(rows))
+    src_label = source.get("key") if source else "default"
+    log.info("Parsed %d rows from %s", len(rows), src_label)
     return rows

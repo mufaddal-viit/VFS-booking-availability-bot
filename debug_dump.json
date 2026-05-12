@@ -1,0 +1,1053 @@
+{
+  "timestamp": "2026-05-12T11:06:47.607357+00:00",
+  "sources": {
+    "abu-dhabi/tourism": {
+      "row_count": 18,
+      "rows": [
+        {
+          "country": "Austria 🇦🇹",
+          "country_url": "https://visa.vfsglobal.com/are/en/aut/login",
+          "status": "Waitlist Open",
+          "status_type": "waitlist",
+          "last_checked": "7 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "abu-dhabi/tourism",
+          "city": "abu-dhabi",
+          "visa_type": "tourism",
+          "id": "abu-dhabi/tourism::Austria 🇦🇹"
+        },
+        {
+          "country": "Cyprus 🇨🇾",
+          "country_url": null,
+          "status": "Waitlist Open",
+          "status_type": "waitlist",
+          "last_checked": "7 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "abu-dhabi/tourism",
+          "city": "abu-dhabi",
+          "visa_type": "tourism",
+          "id": "abu-dhabi/tourism::Cyprus 🇨🇾"
+        },
+        {
+          "country": "Denmark 🇩🇰",
+          "country_url": "https://visa.vfsglobal.com/are/en/dnk/login",
+          "status": "13 May",
+          "status_type": "available",
+          "last_checked": "7 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "abu-dhabi/tourism",
+          "city": "abu-dhabi",
+          "visa_type": "tourism",
+          "id": "abu-dhabi/tourism::Denmark 🇩🇰"
+        },
+        {
+          "country": "Germany 🇩🇪",
+          "country_url": "https://visa.vfsglobal.com/are/en/deu/login",
+          "status": "Waitlist Open",
+          "status_type": "waitlist",
+          "last_checked": "11 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "abu-dhabi/tourism",
+          "city": "abu-dhabi",
+          "visa_type": "tourism",
+          "id": "abu-dhabi/tourism::Germany 🇩🇪"
+        },
+        {
+          "country": "Luxembourg",
+          "country_url": "https://visa.vfsglobal.com/are/en/lux/login",
+          "status": "06 Jul",
+          "status_type": "available",
+          "last_checked": "4 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "abu-dhabi/tourism",
+          "city": "abu-dhabi",
+          "visa_type": "tourism",
+          "id": "abu-dhabi/tourism::Luxembourg"
+        },
+        {
+          "country": "Netherlands 🇳🇱",
+          "country_url": "https://visa.vfsglobal.com/are/en/nld/login",
+          "status": "22 Jul",
+          "status_type": "available",
+          "last_checked": "3 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "abu-dhabi/tourism",
+          "city": "abu-dhabi",
+          "visa_type": "tourism",
+          "id": "abu-dhabi/tourism::Netherlands 🇳🇱"
+        },
+        {
+          "country": "Switzerland 🇨🇭",
+          "country_url": "https://visa.vfsglobal.com/are/en/che/login",
+          "status": "Waitlist Open",
+          "status_type": "waitlist",
+          "last_checked": "17 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "abu-dhabi/tourism",
+          "city": "abu-dhabi",
+          "visa_type": "tourism",
+          "id": "abu-dhabi/tourism::Switzerland 🇨🇭"
+        },
+        {
+          "country": "Czechia 🇨🇿",
+          "country_url": "https://visa.vfsglobal.com/are/en/cze/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "20 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "abu-dhabi/tourism",
+          "city": "abu-dhabi",
+          "visa_type": "tourism",
+          "id": "abu-dhabi/tourism::Czechia 🇨🇿"
+        },
+        {
+          "country": "Estonia 🇪🇪",
+          "country_url": "https://visa.vfsglobal.com/are/en/est/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "13 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "abu-dhabi/tourism",
+          "city": "abu-dhabi",
+          "visa_type": "tourism",
+          "id": "abu-dhabi/tourism::Estonia 🇪🇪"
+        },
+        {
+          "country": "Finland 🇫🇮",
+          "country_url": "https://visa.vfsglobal.com/are/en/fin/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "18 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "abu-dhabi/tourism",
+          "city": "abu-dhabi",
+          "visa_type": "tourism",
+          "id": "abu-dhabi/tourism::Finland 🇫🇮"
+        },
+        {
+          "country": "France 🇫🇷",
+          "country_url": "https://visa.vfsglobal.com/are/en/fra/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "3 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "abu-dhabi/tourism",
+          "city": "abu-dhabi",
+          "visa_type": "tourism",
+          "id": "abu-dhabi/tourism::France 🇫🇷"
+        },
+        {
+          "country": "Greece 🇬🇷",
+          "country_url": "https://visa.vfsglobal.com/are/en/grc/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "17 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "abu-dhabi/tourism",
+          "city": "abu-dhabi",
+          "visa_type": "tourism",
+          "id": "abu-dhabi/tourism::Greece 🇬🇷"
+        },
+        {
+          "country": "Hungary 🇭🇺",
+          "country_url": "https://visa.vfsglobal.com/are/en/hun/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "19 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "abu-dhabi/tourism",
+          "city": "abu-dhabi",
+          "visa_type": "tourism",
+          "id": "abu-dhabi/tourism::Hungary 🇭🇺"
+        },
+        {
+          "country": "Latvia 🇱🇻",
+          "country_url": "https://visa.vfsglobal.com/are/en/lva/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "14 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "abu-dhabi/tourism",
+          "city": "abu-dhabi",
+          "visa_type": "tourism",
+          "id": "abu-dhabi/tourism::Latvia 🇱🇻"
+        },
+        {
+          "country": "Lithuania 🇱🇹",
+          "country_url": "https://visa.vfsglobal.com/are/en/ltu/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "20 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "abu-dhabi/tourism",
+          "city": "abu-dhabi",
+          "visa_type": "tourism",
+          "id": "abu-dhabi/tourism::Lithuania 🇱🇹"
+        },
+        {
+          "country": "Norway 🇳🇴",
+          "country_url": "https://visa.vfsglobal.com/are/en/nor/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "5 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "abu-dhabi/tourism",
+          "city": "abu-dhabi",
+          "visa_type": "tourism",
+          "id": "abu-dhabi/tourism::Norway 🇳🇴"
+        },
+        {
+          "country": "Portugal 🇵🇹",
+          "country_url": "https://visa.vfsglobal.com/are/en/prt/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "18 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "abu-dhabi/tourism",
+          "city": "abu-dhabi",
+          "visa_type": "tourism",
+          "id": "abu-dhabi/tourism::Portugal 🇵🇹"
+        },
+        {
+          "country": "Sweden 🇸🇪",
+          "country_url": "https://visa.vfsglobal.com/are/en/swe/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "a minute ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "abu-dhabi/tourism",
+          "city": "abu-dhabi",
+          "visa_type": "tourism",
+          "id": "abu-dhabi/tourism::Sweden 🇸🇪"
+        }
+      ]
+    },
+    "abu-dhabi/business": {
+      "row_count": 16,
+      "rows": [
+        {
+          "country": "Austria 🇦🇹",
+          "country_url": "https://visa.vfsglobal.com/are/en/aut/login",
+          "status": "08 Jun",
+          "status_type": "available",
+          "last_checked": "7 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "abu-dhabi/business",
+          "city": "abu-dhabi",
+          "visa_type": "business",
+          "id": "abu-dhabi/business::Austria 🇦🇹"
+        },
+        {
+          "country": "Cyprus 🇨🇾",
+          "country_url": null,
+          "status": "Waitlist Open",
+          "status_type": "waitlist",
+          "last_checked": "7 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "abu-dhabi/business",
+          "city": "abu-dhabi",
+          "visa_type": "business",
+          "id": "abu-dhabi/business::Cyprus 🇨🇾"
+        },
+        {
+          "country": "Czechia 🇨🇿",
+          "country_url": "https://visa.vfsglobal.com/are/en/cze/login",
+          "status": "14 May",
+          "status_type": "available",
+          "last_checked": "20 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "abu-dhabi/business",
+          "city": "abu-dhabi",
+          "visa_type": "business",
+          "id": "abu-dhabi/business::Czechia 🇨🇿"
+        },
+        {
+          "country": "Estonia 🇪🇪",
+          "country_url": "https://visa.vfsglobal.com/are/en/est/login",
+          "status": "13 May",
+          "status_type": "available",
+          "last_checked": "13 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "abu-dhabi/business",
+          "city": "abu-dhabi",
+          "visa_type": "business",
+          "id": "abu-dhabi/business::Estonia 🇪🇪"
+        },
+        {
+          "country": "Germany 🇩🇪",
+          "country_url": "https://visa.vfsglobal.com/are/en/deu/login",
+          "status": "Waitlist Open",
+          "status_type": "waitlist",
+          "last_checked": "11 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "abu-dhabi/business",
+          "city": "abu-dhabi",
+          "visa_type": "business",
+          "id": "abu-dhabi/business::Germany 🇩🇪"
+        },
+        {
+          "country": "Luxembourg",
+          "country_url": "https://visa.vfsglobal.com/are/en/lux/login",
+          "status": "14 May",
+          "status_type": "available",
+          "last_checked": "4 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "abu-dhabi/business",
+          "city": "abu-dhabi",
+          "visa_type": "business",
+          "id": "abu-dhabi/business::Luxembourg"
+        },
+        {
+          "country": "Norway 🇳🇴",
+          "country_url": "https://visa.vfsglobal.com/are/en/nor/login",
+          "status": "14 May",
+          "status_type": "available",
+          "last_checked": "5 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "abu-dhabi/business",
+          "city": "abu-dhabi",
+          "visa_type": "business",
+          "id": "abu-dhabi/business::Norway 🇳🇴"
+        },
+        {
+          "country": "Switzerland 🇨🇭",
+          "country_url": "https://visa.vfsglobal.com/are/en/che/login",
+          "status": "20 May",
+          "status_type": "available",
+          "last_checked": "18 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "abu-dhabi/business",
+          "city": "abu-dhabi",
+          "visa_type": "business",
+          "id": "abu-dhabi/business::Switzerland 🇨🇭"
+        },
+        {
+          "country": "Denmark 🇩🇰",
+          "country_url": "https://visa.vfsglobal.com/are/en/dnk/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "7 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "abu-dhabi/business",
+          "city": "abu-dhabi",
+          "visa_type": "business",
+          "id": "abu-dhabi/business::Denmark 🇩🇰"
+        },
+        {
+          "country": "Finland 🇫🇮",
+          "country_url": "https://visa.vfsglobal.com/are/en/fin/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "18 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "abu-dhabi/business",
+          "city": "abu-dhabi",
+          "visa_type": "business",
+          "id": "abu-dhabi/business::Finland 🇫🇮"
+        },
+        {
+          "country": "Greece 🇬🇷",
+          "country_url": "https://visa.vfsglobal.com/are/en/grc/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "17 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "abu-dhabi/business",
+          "city": "abu-dhabi",
+          "visa_type": "business",
+          "id": "abu-dhabi/business::Greece 🇬🇷"
+        },
+        {
+          "country": "Hungary 🇭🇺",
+          "country_url": "https://visa.vfsglobal.com/are/en/hun/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "20 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "abu-dhabi/business",
+          "city": "abu-dhabi",
+          "visa_type": "business",
+          "id": "abu-dhabi/business::Hungary 🇭🇺"
+        },
+        {
+          "country": "Latvia 🇱🇻",
+          "country_url": "https://visa.vfsglobal.com/are/en/lva/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "14 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "abu-dhabi/business",
+          "city": "abu-dhabi",
+          "visa_type": "business",
+          "id": "abu-dhabi/business::Latvia 🇱🇻"
+        },
+        {
+          "country": "Lithuania 🇱🇹",
+          "country_url": "https://visa.vfsglobal.com/are/en/ltu/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "20 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "abu-dhabi/business",
+          "city": "abu-dhabi",
+          "visa_type": "business",
+          "id": "abu-dhabi/business::Lithuania 🇱🇹"
+        },
+        {
+          "country": "Portugal 🇵🇹",
+          "country_url": "https://visa.vfsglobal.com/are/en/prt/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "18 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "abu-dhabi/business",
+          "city": "abu-dhabi",
+          "visa_type": "business",
+          "id": "abu-dhabi/business::Portugal 🇵🇹"
+        },
+        {
+          "country": "Sweden 🇸🇪",
+          "country_url": "https://visa.vfsglobal.com/are/en/swe/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "a minute ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "abu-dhabi/business",
+          "city": "abu-dhabi",
+          "visa_type": "business",
+          "id": "abu-dhabi/business::Sweden 🇸🇪"
+        }
+      ]
+    },
+    "dubai/tourism": {
+      "row_count": 19,
+      "rows": [
+        {
+          "country": "Croatia 🇭🇷",
+          "country_url": "https://visa.vfsglobal.com/are/en/hrv/login",
+          "status": "Waitlist Open",
+          "status_type": "waitlist",
+          "last_checked": "12 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "dubai/tourism",
+          "city": "dubai",
+          "visa_type": "tourism",
+          "id": "dubai/tourism::Croatia 🇭🇷"
+        },
+        {
+          "country": "Cyprus 🇨🇾",
+          "country_url": null,
+          "status": "Waitlist Open",
+          "status_type": "waitlist",
+          "last_checked": "7 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "dubai/tourism",
+          "city": "dubai",
+          "visa_type": "tourism",
+          "id": "dubai/tourism::Cyprus 🇨🇾"
+        },
+        {
+          "country": "Denmark 🇩🇰",
+          "country_url": "https://visa.vfsglobal.com/are/en/dnk/login",
+          "status": "15 May",
+          "status_type": "available",
+          "last_checked": "6 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "dubai/tourism",
+          "city": "dubai",
+          "visa_type": "tourism",
+          "id": "dubai/tourism::Denmark 🇩🇰"
+        },
+        {
+          "country": "Germany 🇩🇪",
+          "country_url": "https://visa.vfsglobal.com/are/en/deu/login",
+          "status": "Waitlist Open",
+          "status_type": "waitlist",
+          "last_checked": "12 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "dubai/tourism",
+          "city": "dubai",
+          "visa_type": "tourism",
+          "id": "dubai/tourism::Germany 🇩🇪"
+        },
+        {
+          "country": "Luxembourg",
+          "country_url": "https://visa.vfsglobal.com/are/en/lux/login",
+          "status": "07 Jul",
+          "status_type": "available",
+          "last_checked": "4 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "dubai/tourism",
+          "city": "dubai",
+          "visa_type": "tourism",
+          "id": "dubai/tourism::Luxembourg"
+        },
+        {
+          "country": "Netherlands 🇳🇱",
+          "country_url": "https://visa.vfsglobal.com/are/en/nld/login",
+          "status": "Waitlist Open",
+          "status_type": "waitlist",
+          "last_checked": "4 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "dubai/tourism",
+          "city": "dubai",
+          "visa_type": "tourism",
+          "id": "dubai/tourism::Netherlands 🇳🇱"
+        },
+        {
+          "country": "Switzerland 🇨🇭",
+          "country_url": "https://visa.vfsglobal.com/are/en/che/login",
+          "status": "Waitlist Open",
+          "status_type": "waitlist",
+          "last_checked": "17 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "dubai/tourism",
+          "city": "dubai",
+          "visa_type": "tourism",
+          "id": "dubai/tourism::Switzerland 🇨🇭"
+        },
+        {
+          "country": "Austria 🇦🇹",
+          "country_url": "https://visa.vfsglobal.com/are/en/aut/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "7 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "dubai/tourism",
+          "city": "dubai",
+          "visa_type": "tourism",
+          "id": "dubai/tourism::Austria 🇦🇹"
+        },
+        {
+          "country": "Czechia 🇨🇿",
+          "country_url": "https://visa.vfsglobal.com/are/en/cze/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "20 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "dubai/tourism",
+          "city": "dubai",
+          "visa_type": "tourism",
+          "id": "dubai/tourism::Czechia 🇨🇿"
+        },
+        {
+          "country": "Estonia 🇪🇪",
+          "country_url": "https://visa.vfsglobal.com/are/en/est/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "13 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "dubai/tourism",
+          "city": "dubai",
+          "visa_type": "tourism",
+          "id": "dubai/tourism::Estonia 🇪🇪"
+        },
+        {
+          "country": "Finland 🇫🇮",
+          "country_url": "https://visa.vfsglobal.com/are/en/fin/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "17 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "dubai/tourism",
+          "city": "dubai",
+          "visa_type": "tourism",
+          "id": "dubai/tourism::Finland 🇫🇮"
+        },
+        {
+          "country": "Greece 🇬🇷",
+          "country_url": "https://visa.vfsglobal.com/are/en/grc/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "17 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "dubai/tourism",
+          "city": "dubai",
+          "visa_type": "tourism",
+          "id": "dubai/tourism::Greece 🇬🇷"
+        },
+        {
+          "country": "Hungary 🇭🇺",
+          "country_url": "https://visa.vfsglobal.com/are/en/hun/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "19 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "dubai/tourism",
+          "city": "dubai",
+          "visa_type": "tourism",
+          "id": "dubai/tourism::Hungary 🇭🇺"
+        },
+        {
+          "country": "Italy 🇮🇹",
+          "country_url": "https://visa.vfsglobal.com/are/en/ita/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "4 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "dubai/tourism",
+          "city": "dubai",
+          "visa_type": "tourism",
+          "id": "dubai/tourism::Italy 🇮🇹"
+        },
+        {
+          "country": "Latvia 🇱🇻",
+          "country_url": "https://visa.vfsglobal.com/are/en/lva/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "13 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "dubai/tourism",
+          "city": "dubai",
+          "visa_type": "tourism",
+          "id": "dubai/tourism::Latvia 🇱🇻"
+        },
+        {
+          "country": "Lithuania 🇱🇹",
+          "country_url": "https://visa.vfsglobal.com/are/en/ltu/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "20 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "dubai/tourism",
+          "city": "dubai",
+          "visa_type": "tourism",
+          "id": "dubai/tourism::Lithuania 🇱🇹"
+        },
+        {
+          "country": "Norway 🇳🇴",
+          "country_url": "https://visa.vfsglobal.com/are/en/nor/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "5 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "dubai/tourism",
+          "city": "dubai",
+          "visa_type": "tourism",
+          "id": "dubai/tourism::Norway 🇳🇴"
+        },
+        {
+          "country": "Portugal 🇵🇹",
+          "country_url": "https://visa.vfsglobal.com/are/en/prt/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "18 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "dubai/tourism",
+          "city": "dubai",
+          "visa_type": "tourism",
+          "id": "dubai/tourism::Portugal 🇵🇹"
+        },
+        {
+          "country": "Sweden 🇸🇪",
+          "country_url": "https://visa.vfsglobal.com/are/en/swe/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "50 seconds ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "dubai/tourism",
+          "city": "dubai",
+          "visa_type": "tourism",
+          "id": "dubai/tourism::Sweden 🇸🇪"
+        }
+      ]
+    },
+    "dubai/business": {
+      "row_count": 16,
+      "rows": [
+        {
+          "country": "Austria 🇦🇹",
+          "country_url": "https://visa.vfsglobal.com/are/en/aut/login",
+          "status": "10 Jun",
+          "status_type": "available",
+          "last_checked": "7 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "dubai/business",
+          "city": "dubai",
+          "visa_type": "business",
+          "id": "dubai/business::Austria 🇦🇹"
+        },
+        {
+          "country": "Croatia 🇭🇷",
+          "country_url": "https://visa.vfsglobal.com/are/en/hrv/login",
+          "status": "Waitlist Open",
+          "status_type": "waitlist",
+          "last_checked": "12 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "dubai/business",
+          "city": "dubai",
+          "visa_type": "business",
+          "id": "dubai/business::Croatia 🇭🇷"
+        },
+        {
+          "country": "Cyprus 🇨🇾",
+          "country_url": null,
+          "status": "Waitlist Open",
+          "status_type": "waitlist",
+          "last_checked": "7 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "dubai/business",
+          "city": "dubai",
+          "visa_type": "business",
+          "id": "dubai/business::Cyprus 🇨🇾"
+        },
+        {
+          "country": "Czechia 🇨🇿",
+          "country_url": "https://visa.vfsglobal.com/are/en/cze/login",
+          "status": "13 May",
+          "status_type": "available",
+          "last_checked": "20 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "dubai/business",
+          "city": "dubai",
+          "visa_type": "business",
+          "id": "dubai/business::Czechia 🇨🇿"
+        },
+        {
+          "country": "Estonia 🇪🇪",
+          "country_url": "https://visa.vfsglobal.com/are/en/est/login",
+          "status": "13 May",
+          "status_type": "available",
+          "last_checked": "13 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "dubai/business",
+          "city": "dubai",
+          "visa_type": "business",
+          "id": "dubai/business::Estonia 🇪🇪"
+        },
+        {
+          "country": "Germany 🇩🇪",
+          "country_url": "https://visa.vfsglobal.com/are/en/deu/login",
+          "status": "Waitlist Open",
+          "status_type": "waitlist",
+          "last_checked": "12 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "dubai/business",
+          "city": "dubai",
+          "visa_type": "business",
+          "id": "dubai/business::Germany 🇩🇪"
+        },
+        {
+          "country": "Luxembourg",
+          "country_url": "https://visa.vfsglobal.com/are/en/lux/login",
+          "status": "13 May",
+          "status_type": "available",
+          "last_checked": "4 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "dubai/business",
+          "city": "dubai",
+          "visa_type": "business",
+          "id": "dubai/business::Luxembourg"
+        },
+        {
+          "country": "Norway 🇳🇴",
+          "country_url": "https://visa.vfsglobal.com/are/en/nor/login",
+          "status": "15 May",
+          "status_type": "available",
+          "last_checked": "5 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "dubai/business",
+          "city": "dubai",
+          "visa_type": "business",
+          "id": "dubai/business::Norway 🇳🇴"
+        },
+        {
+          "country": "Switzerland 🇨🇭",
+          "country_url": "https://visa.vfsglobal.com/are/en/che/login",
+          "status": "20 May",
+          "status_type": "available",
+          "last_checked": "17 minutes ago",
+          "months": {
+            "May": false,
+            "Jun": false,
+            "Jul": false
+          },
+          "source_key": "dubai/business",
+          "city": "dubai",
+          "visa_type": "business",
+          "id": "dubai/business::Switzerland 🇨🇭"
+        },
+        {
+          "country": "Denmark 🇩🇰",
+          "country_url": "https://visa.vfsglobal.com/are/en/dnk/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "7 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "dubai/business",
+          "city": "dubai",
+          "visa_type": "business",
+          "id": "dubai/business::Denmark 🇩🇰"
+        },
+        {
+          "country": "Finland 🇫🇮",
+          "country_url": "https://visa.vfsglobal.com/are/en/fin/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "18 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "dubai/business",
+          "city": "dubai",
+          "visa_type": "business",
+          "id": "dubai/business::Finland 🇫🇮"
+        },
+        {
+          "country": "Greece 🇬🇷",
+          "country_url": "https://visa.vfsglobal.com/are/en/grc/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "17 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "dubai/business",
+          "city": "dubai",
+          "visa_type": "business",
+          "id": "dubai/business::Greece 🇬🇷"
+        },
+        {
+          "country": "Hungary 🇭🇺",
+          "country_url": "https://visa.vfsglobal.com/are/en/hun/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "19 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "dubai/business",
+          "city": "dubai",
+          "visa_type": "business",
+          "id": "dubai/business::Hungary 🇭🇺"
+        },
+        {
+          "country": "Lithuania 🇱🇹",
+          "country_url": "https://visa.vfsglobal.com/are/en/ltu/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "20 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "dubai/business",
+          "city": "dubai",
+          "visa_type": "business",
+          "id": "dubai/business::Lithuania 🇱🇹"
+        },
+        {
+          "country": "Portugal 🇵🇹",
+          "country_url": "https://visa.vfsglobal.com/are/en/prt/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "18 minutes ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "dubai/business",
+          "city": "dubai",
+          "visa_type": "business",
+          "id": "dubai/business::Portugal 🇵🇹"
+        },
+        {
+          "country": "Sweden 🇸🇪",
+          "country_url": "https://visa.vfsglobal.com/are/en/swe/login",
+          "status": "No availability",
+          "status_type": "unavailable",
+          "last_checked": "a minute ago",
+          "months": {
+            "May": false
+          },
+          "source_key": "dubai/business",
+          "city": "dubai",
+          "visa_type": "business",
+          "id": "dubai/business::Sweden 🇸🇪"
+        }
+      ]
+    }
+  }
+}

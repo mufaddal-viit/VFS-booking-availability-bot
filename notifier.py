@@ -79,9 +79,18 @@ def notify_events(events: list[dict]) -> None:
 
     log.info("All events: %s", [e["kind"] for e in events])
 
-    # Only notify on available slot changes
-    relevant = [e for e in events if e["kind"] in ("became_available", "date_changed")]
-    log.info("Relevant events (became_available/date_changed): %d", len(relevant))
+    # Notify on:
+    #   - became_available / date_changed  (slot opened or moved)
+    #   - new_country IF the row is already available (first run baseline)
+    def is_relevant(e: dict) -> bool:
+        if e["kind"] in ("became_available", "date_changed"):
+            return True
+        if e["kind"] == "new_country":
+            return (e.get("new") or {}).get("status_type") == "available"
+        return False
+
+    relevant = [e for e in events if is_relevant(e)]
+    log.info("Relevant events (available slots): %d", len(relevant))
 
     for ev in relevant:
         new_row = ev.get("new")
@@ -90,12 +99,20 @@ def notify_events(events: list[dict]) -> None:
         country = new_row.get("country", "?")
         status = new_row.get("status", "?")
         url = new_row.get("country_url", "")
+        city = (new_row.get("city") or "").replace("-", " ").title()
+        visa = (new_row.get("visa_type") or "").title()
 
-        text = f"🟢 {country}\n📅 {status}"
+        parts = [
+            f"<b>Destination country:</b> {html.escape(country)}",
+            f"<b>Source destination:</b> {html.escape(city)}",
+            f"<b>Booking date:</b> {html.escape(status)}",
+            f"<b>Visa type:</b> {html.escape(visa)}",
+        ]
         if url:
-            text += f'\n<a href="{url}">Book now</a>'
+            parts.append(f'<a href="{html.escape(url)}">Click here to book now</a>')
+        text = "\n".join(parts)
 
-        # Log without emojis (for Windows console compatibility)
-        country_clean = "".join(c for c in country if ord(c) < 0x1F600 or ord(c) > 0x1F64F)
-        log.info("Sent: %s | %s", country_clean.strip(), status)
+        # Log without emojis/non-ASCII (for Windows console compatibility)
+        country_clean = country.encode("ascii", "ignore").decode("ascii").strip()
+        log.info("Sent: %s | %s | %s", country_clean, status, ev.get("source_key"))
         send_telegram(text)
