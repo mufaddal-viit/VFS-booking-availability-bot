@@ -1,7 +1,11 @@
 .env
 snapshot.json
+debug_dump.json
+debug_*.html
 *.log
 __pycache__/
 *.pyc
 .venv/
 venv/
+.aws-sam/
+samconfig.toml

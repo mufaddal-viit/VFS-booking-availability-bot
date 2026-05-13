@@ -9,7 +9,11 @@
       "PowerShell(py probe_urls.py)",
       "PowerShell(py main.py --once --debug-dump 2>&1)",
       "PowerShell(py debug_check.py 2>&1)",
-      "PowerShell(py preview_message.py)"
+      "PowerShell(py preview_message.py)",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\Universal\\\\Documents\\\\mufaddal\\\\dataExtractor\" -Recurse -Force)",
+      "Bash(Select-Object FullName, PSIsContainer)",
+      "Bash(Sort-Object FullName)",
+      "Bash(Format-Table -AutoSize)"
     ]
   }
 }

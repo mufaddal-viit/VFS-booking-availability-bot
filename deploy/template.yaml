@@ -1,0 +1,115 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+
+Description: >
+  Schengen Appointment Watcher — Lambda triggered by EventBridge every 60 minutes.
+  State stored in S3. Telegram credentials in Secrets Manager.
+
+Parameters:
+  TelegramBotToken:
+    Type: String
+    NoEcho: true
+    Description: Telegram bot token (stored in Secrets Manager, never in plain env)
+
+  TelegramChatId:
+    Type: String
+    NoEcho: true
+    Description: Telegram chat ID
+
+  PollIntervalMinutes:
+    Type: Number
+    Default: 60
+    Description: How often (minutes) to poll schengenappointments.com
+
+Globals:
+  Function:
+    Runtime: python3.11
+    Timeout: 120        # 2 min max — 4 concurrent fetches + parse + diff + notify
+    MemorySize: 256
+    Environment:
+      Variables:
+        STATE_BUCKET: !Ref SnapshotBucket
+        STATE_KEY: snapshot.json
+        SECRETS_ARN: !Ref TelegramSecret
+
+Resources:
+
+  # ── Secrets Manager ─────────────────────────────────────────────────────────
+  TelegramSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: schengen-watcher/telegram
+      Description: Telegram bot credentials for Schengen watcher
+      SecretString: !Sub |
+        {
+          "TELEGRAM_BOT_TOKEN": "${TelegramBotToken}",
+          "TELEGRAM_CHAT_ID": "${TelegramChatId}"
+        }
+
+  # ── S3 snapshot bucket ───────────────────────────────────────────────────────
+  SnapshotBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "schengen-watcher-snapshot-${AWS::AccountId}"
+      VersioningConfiguration:
+        Status: Enabled         # free disaster recovery — restore any baseline
+      LifecycleConfiguration:
+        Rules:
+          - Id: DeleteOldVersions
+            Status: Enabled
+            NoncurrentVersionExpirationInDays: 30
+
+  # ── Lambda function ──────────────────────────────────────────────────────────
+  WatcherFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: schengen-appointment-watcher
+      Handler: main.lambda_handler
+      CodeUri: ../          # SAM zips everything from the project root
+      Description: Polls schengenappointments.com and sends Telegram alerts
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref SnapshotBucket
+        - S3WritePolicy:
+            BucketName: !Ref SnapshotBucket
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref TelegramSecret
+      Events:
+        ScheduledPoll:
+          Type: Schedule
+          Properties:
+            Name: schengen-watcher-schedule
+            Schedule: !Sub "rate(${PollIntervalMinutes} minutes)"
+            Description: Triggers the Schengen watcher on a fixed interval
+            Enabled: true
+
+  # ── CloudWatch alarm: Lambda errors ─────────────────────────────────────────
+  WatcherErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: schengen-watcher-errors
+      AlarmDescription: Lambda threw an unhandled exception
+      Namespace: AWS/Lambda
+      MetricName: Errors
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref WatcherFunction
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      TreatMissingData: notBreaching
+
+Outputs:
+  WatcherFunctionArn:
+    Description: Lambda function ARN
+    Value: !GetAtt WatcherFunction.Arn
+
+  SnapshotBucketName:
+    Description: S3 bucket holding the appointment snapshot
+    Value: !Ref SnapshotBucket
+
+  TelegramSecretArn:
+    Description: Secrets Manager ARN for Telegram credentials
+    Value: !Ref TelegramSecret

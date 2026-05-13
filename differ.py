@@ -2,8 +2,11 @@ import logging
 
 log = logging.getLogger(__name__)
 
-# Fields we DO NOT consider when diffing (volatile metadata)
-IGNORED_FIELDS = {"last_checked"}
+# Fields ignored entirely — never compared, never listed in changed_fields
+IGNORED_FIELDS = {"last_checked", "source_key", "city", "visa_type", "country_url", "id"}
+
+# The fields that actually reflect appointment availability
+AVAILABILITY_FIELDS = {"status", "status_type", "months"}
 
 
 def _row_key(row: dict) -> str:
@@ -14,8 +17,9 @@ def _index(rows: list[dict]) -> dict[str, dict]:
     return {_row_key(r): r for r in rows if _row_key(r)}
 
 
-def _comparable(row: dict) -> dict:
-    return {k: v for k, v in row.items() if k not in IGNORED_FIELDS}
+def _availability(row: dict) -> dict:
+    """Extract only availability-relevant fields for comparison."""
+    return {k: v for k, v in row.items() if k in AVAILABILITY_FIELDS}
 
 
 def _classify_change(old: dict, new: dict) -> str:
@@ -31,11 +35,12 @@ def _classify_change(old: dict, new: dict) -> str:
 
 
 def diff_snapshots(old_rows: list[dict], new_rows: list[dict]) -> list[dict]:
-    """Compare old vs new rows. Any field change except `last_checked` is a change.
+    """Compare old vs new rows on availability fields only (status, status_type, months).
+
+    last_checked and other metadata fields are completely ignored.
 
     Event shape: { id, country, source_key, kind, old, new, changed_fields }
-    kind in: new_country, became_available, became_unavailable, date_changed,
-             status_changed, removed
+    kind in: new_country, became_available, became_unavailable, status_changed, removed
     """
     old = _index(old_rows)
     new = _index(new_rows)
@@ -51,16 +56,16 @@ def diff_snapshots(old_rows: list[dict], new_rows: list[dict]) -> list[dict]:
                 "kind": "new_country",
                 "old": None,
                 "new": n,
-                "changed_fields": list(_comparable(n).keys()),
+                "changed_fields": list(_availability(n).keys()),
             })
             continue
 
-        old_cmp = _comparable(o)
-        new_cmp = _comparable(n)
-        if old_cmp == new_cmp:
+        old_avail = _availability(o)
+        new_avail = _availability(n)
+        if old_avail == new_avail:
             continue
 
-        changed = [k for k in set(old_cmp) | set(new_cmp) if old_cmp.get(k) != new_cmp.get(k)]
+        changed = [k for k in AVAILABILITY_FIELDS if old_avail.get(k) != new_avail.get(k)]
         events.append({
             "id": row_id,
             "country": n.get("country"),
